@@ -5,6 +5,7 @@
         "engine.io": "*",
         "socket.io": "*",
         "debug": "*",
-        "underscore":"*"
+        "underscore":"*",
+        "main": "index.js"
     }
 }
