@@ -3,7 +3,8 @@ var express = require("express"),
     server = require('http').createServer(app),
     io = require('socket.io')(server),
     _ = require('underscore'),
-    debug = require("debug")("index.js");
+    debug = require("debug")("index.js"),
+    extend = require("extend");
 
 var ipaddr = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 var port = process.env.OPENSHIFT_NODEJS_PORT || parseInt(process.argv.pop()) || 8080;
@@ -15,18 +16,21 @@ server.listen(port, ipaddr, function () {
 });
 
 var $scope = {
+    model: {},
+    socket: null,
     init: function () {
         io.on('connection', $scope.connection);
     },
     connection: function (socket) {
-        socket.on('receive message', $scope.receive);
+        $scope.socket = socket;
+        $scope.socket.on('receive message', $scope.receive);
     },
     receive: function (data) {
-        var oOut = {
+        extend($scope.model, {
             from: _.escape(data.from),
             message: _.escape(data.message)
-        };
-        socket.broadcast.emit("receive message", oOut);
+        });
+        $scope.socket.broadcast.emit("receive message", $scope.model);
     }
 };
 $scope.init();

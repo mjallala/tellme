@@ -6,6 +6,7 @@
         "engine.io": "*",
         "socket.io": "*",
         "debug": "*",
-        "underscore":"*"
+        "underscore":"*",
+        "extend":"*"
     }
 }
