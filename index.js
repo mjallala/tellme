@@ -19,8 +19,7 @@ var $scope = {
         io.on('connection', $scope.connection);
     },
     connection: function (socket) {
-        socket.on('receive message'
-            $scope.receive);
+        socket.on('receive message', $scope.receive);
     },
     receive: function (data) {
         var oOut = {
