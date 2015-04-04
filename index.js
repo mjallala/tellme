@@ -16,22 +16,38 @@ server.listen(port, ipaddr, function () {
 });
 
 var $scope = {
-    model: {},
-    socket: null,
+    model: {issues:[]},
     init: function () {
         io.on('connection', $scope.connection);
     },
     connection: function (socket) {
-        $scope.socket = socket;
-        $scope.socket.on('receive message', $scope.receive);
+        socket.on('receive message', $scope.receive);
+        socket.on('receive issue', $scope.newIssue);
+        socket.on('receive comment', $scope.newComment);
     },
     receive: function (data) {
         extend($scope.model, {
             from: _.escape(data.from),
             message: _.escape(data.message)
         });
-        $scope.socket.broadcast.emit("receive message", $scope.model);
+        io.emit("receive message", $scope.model);
+    },
+    newIssue: function(data) {
+        $scope.model.issues.unshift(data);
+        io.emit("receive issue", $scope.model);
+    },
+    newComment: function(data){
+        for(var n = 0; n < $scope.model.issues.length; n++){
+            if($scope.model.issues[n].id == data.id){
+                delete data.id;
+                // then we want to add the comment to this issue
+                $scope.model.issues[n].comments.unshift(data);
+                io.emit("receive issue", $scope.model);
+                return;
+            }
+        }
     }
+
 };
 $scope.init();
 

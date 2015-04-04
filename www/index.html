@@ -3,36 +3,117 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
-</head>
-<body>
-    <div id="messages">
-    </div>
-    <form id="messageForm">
-        <input id="from" placeholder="enter your alias" />
-        <input id="message" placeholder="enter your message" />
-        <input type="submit" />
-    </form>
     <script src="https://code.jquery.com/jquery-2.1.3.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore.js"></script>
     <script src="socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular.js"></script>
     <script>
-        jQuery(document).ready(function () {
-            var socket = io(document.URL);
-            jQuery("#messageForm").submit(function () {
-                var data = {
-                    from: jQuery("#from").val(),
-                    message: jQuery("#message").val()
-                };
-                socket.emit('receive message', data);
-                jQuery("#messages").append('<div><strong>me:&nbsp;&nbsp;</strong>' + _.escape(data.message) + "</div>");
-                jQuery("#message").val("");
-                return false;
-            });
-            socket.on('receive message', function (data) {
-                jQuery("#messages").append('<div><strong>' + _.escape(data.from) + ':&nbsp;&nbsp;</strong>' + _.escape(data.message) + "</div>");
-            });
+        angular.module("myApp", []).controller("myCtrl", function ($scope) {
+            angular.extend($scope, {
+                socket: null,
+                init: function(){
+                    $scope.socket = io(document.URL);
+                    document.addEventListener('deviceready', $scope.deviceReady, false);
+                    $scope.socket.on("receive message", $scope.receive);
+                    $scope.socket.on("receive issue", $scope.update);
+                },
+                deviceReady: function(){
+                    $scope.socket = io("https://tellme-hildred.rhcloud.com");
+                    $scope.socket.on("receive message", $scope.receive);
+                    $scope.socket.on("receive issue", $scope.update);
+                },
+                messages: [],
+                model:{issues:[]},
+                receive: function(data){
+                    $scope.messages.unshift(data);
+                    $scope.$apply();
+                },
+                update: function(data){
+                    angular.extend($scope.model, data);
+                    $scope.$apply();
+                },
+                sendMessage: function(){
+                    var data = {
+                        from: $scope.from,
+                        message: $scope.message
+                    };
+                    $scope.socket.emit('receive message', data);
+                    $scope.message="";
+                },
+                addIssue: function(){
+                    var data ={
+                        id: $scope.generateUUID(),
+                        reporter: $scope.from,
+                        title: $scope.issueTitle,
+                        comments: []
+                    };
+                    $scope.socket.emit('receive issue', data);
+                    $scope.issueTitle="";
+                },
+                addComment: function(issue){
+                    var data ={
+                        id: issue.id,
+                        commenter: $scope.from,
+                        comment: issue.newcomment
+                    };
+                    $scope.socket.emit('receive comment', data);
+                    issue.newComment="";
+                },
+                generateUUID: function () {
+                    var d = new Date().getTime();
+                    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                        var r = (d + Math.random() * 16) % 16 | 0;
+                        d = Math.floor(d / 16);
+                        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                    });
+                    return uuid;
+                }
+            }).init();
         });
     </script>
+    <style>
+        td:first-of-type{
+            background-color: lime;
+            width: 10em;
+        }
+    </style>
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+    <form ng-submit="addIssue()">
+        <input ng-model="issueTitle" placeholder="new issue"/>
+        <input type="submit" />
+    </form>
+    <table>
+        <tbody ng-repeat="issue in model.issues">
+            <tr>
+                <td ng-bind="issue.reporter"></td>
+                <td ng-bind="issue.title"></td>
+            </tr>
+            <tr>
+                <td colspan=2>
+                    <form ng-submit="addComment(issue)">
+                        <input ng-model="issue.newcomment" placeholder="comment" />
+                        <input type="submit" />
+                    </form>
+                </td>
+            </tr>
+            <tr ng-repeat="comment in issue.comments">
+                <td ng-bind='comment.commenter'></td>
+                <td ng-bind='comment.comment'></td>
+            </tr>
+        </tbody>
+    </table>
+    <form ng-submit="sendMessage()">
+        <input ng-model="from" placeholder="enter your alias" />
+        <input ng-model="message" placeholder="enter your message" />
+        <input type="submit" />
+    </form>
+    <table>
+        <tr ng-repeat="message in messages">
+            <td ng-bind="message.from"></td>
+            <td ng-bind="message.message"></td>
+        </tr>
+    </table>
 </body>
 
 </html>
