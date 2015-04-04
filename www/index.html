@@ -1,5 +1,6 @@
 <!Doctype html>
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
@@ -10,54 +11,61 @@
     <script>
         angular.module("myApp", []).controller("myCtrl", function ($scope) {
             angular.extend($scope, {
+                email:null,
                 socket: null,
-                init: function(){
+                init: function () {
+                    if(typeof(localStorage.getItem("email"))!='undefined'){
+                        $scope.from = localStorage.from;
+                        $scope.email = localStorage.email;
+                    }
                     $scope.socket = io(document.URL);
                     document.addEventListener('deviceready', $scope.deviceReady, false);
                     $scope.socket.on("receive message", $scope.receive);
                     $scope.socket.on("receive issue", $scope.update);
                 },
-                deviceReady: function(){
+                deviceReady: function () {
                     $scope.socket = io("https://tellme-hildred.rhcloud.com");
                     $scope.socket.on("receive message", $scope.receive);
                     $scope.socket.on("receive issue", $scope.update);
                 },
                 messages: [],
-                model:{issues:[]},
-                receive: function(data){
+                model: {
+                    issues: []
+                },
+                receive: function (data) {
                     $scope.messages.unshift(data);
                     $scope.$apply();
                 },
-                update: function(data){
+                update: function (data) {
                     angular.extend($scope.model, data);
                     $scope.$apply();
                 },
-                sendMessage: function(){
+                sendMessage: function () {
                     var data = {
                         from: $scope.from,
                         message: $scope.message
                     };
                     $scope.socket.emit('receive message', data);
-                    $scope.message="";
+                    $scope.message = "";
                 },
-                addIssue: function(){
-                    var data ={
+                addIssue: function () {
+                    var data = {
                         id: $scope.generateUUID(),
                         reporter: $scope.from,
                         title: $scope.issueTitle,
                         comments: []
                     };
                     $scope.socket.emit('receive issue', data);
-                    $scope.issueTitle="";
+                    $scope.issueTitle = "";
                 },
-                addComment: function(issue){
-                    var data ={
+                addComment: function (issue) {
+                    var data = {
                         id: issue.id,
                         commenter: $scope.from,
                         comment: issue.newcomment
                     };
                     $scope.socket.emit('receive comment', data);
-                    issue.newComment="";
+                    issue.newComment = "";
                 },
                 generateUUID: function () {
                     var d = new Date().getTime();
@@ -72,48 +80,54 @@
         });
     </script>
     <style>
-        td:first-of-type{
+        td:first-of-type {
             background-color: lime;
             width: 10em;
         }
     </style>
 </head>
+
 <body ng-app="myApp" ng-controller="myCtrl">
-    <form ng-submit="addIssue()">
-        <input ng-model="issueTitle" placeholder="new issue"/>
-        <input type="submit" />
-    </form>
-    <table>
-        <tbody ng-repeat="issue in model.issues">
-            <tr>
-                <td ng-bind="issue.reporter"></td>
-                <td ng-bind="issue.title"></td>
+    <div ng-hide="email != null">
+        <input ng-model="from" placeholder="desired alias" />
+    </div>
+    <div ng-hide="email == null">
+        <form ng-submit="addIssue()">
+            <input ng-model="issueTitle" placeholder="new issue" />
+            <input type="submit" />
+        </form>
+        <table>
+            <tbody ng-repeat="issue in model.issues">
+                <tr>
+                    <td ng-bind="issue.reporter"></td>
+                    <td ng-bind="issue.title"></td>
+                </tr>
+                <tr>
+                    <td colspan=2>
+                        <form ng-submit="addComment(issue)">
+                            <input ng-model="issue.newcomment" placeholder="comment" />
+                            <input type="submit" />
+                        </form>
+                    </td>
+                </tr>
+                <tr ng-repeat="comment in issue.comments">
+                    <td ng-bind='comment.commenter'></td>
+                    <td ng-bind='comment.comment'></td>
+                </tr>
+            </tbody>
+        </table>
+        <form ng-submit="sendMessage()">
+            <input ng-model="from" placeholder="enter your alias" />
+            <input ng-model="message" placeholder="enter your message" />
+            <input type="submit" />
+        </form>
+        <table>
+            <tr ng-repeat="message in messages">
+                <td ng-bind="message.from"></td>
+                <td ng-bind="message.message"></td>
             </tr>
-            <tr>
-                <td colspan=2>
-                    <form ng-submit="addComment(issue)">
-                        <input ng-model="issue.newcomment" placeholder="comment" />
-                        <input type="submit" />
-                    </form>
-                </td>
-            </tr>
-            <tr ng-repeat="comment in issue.comments">
-                <td ng-bind='comment.commenter'></td>
-                <td ng-bind='comment.comment'></td>
-            </tr>
-        </tbody>
-    </table>
-    <form ng-submit="sendMessage()">
-        <input ng-model="from" placeholder="enter your alias" />
-        <input ng-model="message" placeholder="enter your message" />
-        <input type="submit" />
-    </form>
-    <table>
-        <tr ng-repeat="message in messages">
-            <td ng-bind="message.from"></td>
-            <td ng-bind="message.message"></td>
-        </tr>
-    </table>
+        </table>
+    </div>
 </body>
 
 </html>
