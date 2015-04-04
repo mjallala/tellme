@@ -24,6 +24,7 @@ var $scope = {
         socket.on('receive message', $scope.receive);
         socket.on('receive issue', $scope.newIssue);
         socket.on('receive comment', $scope.newComment);
+        socket.emit("receive issue", $scope.model);
     },
     receive: function (data) {
         extend($scope.model, {
