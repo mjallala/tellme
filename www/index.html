@@ -4,6 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+    <script src="cordova.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.3.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore.js"></script>
     <script src="socket.io/socket.io.js"></script>
@@ -28,8 +29,9 @@
                     $scope.socket.on("receive issue", $scope.update);
                 },
                 deviceReady: function () {
-                    $scope.url = "https://tellme-hildred.rhcloud.com";
-                    $scope.socket = io($scope.url);
+                    $scope.url = "https://tellme-hildred.rhcloud.com/";
+                    $scope.socket.disconnect();
+                    $scope.socket = io.connect($scope.url);
                     $scope.socket.on("receive message", $scope.receive);
                     $scope.socket.on("receive issue", $scope.update);
                 },
@@ -109,7 +111,8 @@
                     });
                     return uuid;
                 }
-            }).init();
+            });
+            $scope.init();
         });
     </script>
     <style>

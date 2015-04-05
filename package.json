@@ -9,6 +9,7 @@
         "underscore":"*",
         "extend":"*",
         "MD5": "*",
-        "body-parser": "*"
+        "body-parser": "*",
+        "cors": "*"
     }
 }
