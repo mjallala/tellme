@@ -26,6 +26,7 @@ server.listen(port, ipaddr, function () {
 var $scope = {
     model: {issues:[]},
     init: function () {
+        io.set('origins', '*:*');
         io.on('connection', $scope.connection);
     },
     connection: function (socket) {

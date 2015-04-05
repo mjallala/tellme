@@ -30,10 +30,7 @@
                 },
                 deviceReady: function () {
                     $scope.url = "https://tellme-hildred.rhcloud.com/";
-                    $scope.socket.disconnect();
-                    $scope.socket = io.connect($scope.url);
-                    $scope.socket.on("receive message", $scope.receive);
-                    $scope.socket.on("receive issue", $scope.update);
+                    $scope.socket = io($scope.url);
                 },
                 messages: [],
                 model: {
