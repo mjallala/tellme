@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.salesucation.youarehere" version="0.0.3">
+
+    <name>Issue Editor</name>
+
+    <description>
+        Collaborative editing of issues
+    </description>
+    <content src="www/index.html" />
+    <author href="https://rhildred.github.io" email="rhildred@gmail.com">
+        Rich Hildred and Mobile App Class of 2015
+    </author>
+</widget>

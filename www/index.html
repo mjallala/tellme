@@ -23,7 +23,7 @@
                         $scope.from = localStorage.from;
                         $scope.email = localStorage.email;
                     }
-                    $scope.socket = io(document.URL);
+                    $scope.socket = io($scope.url);
                     document.addEventListener('deviceready', $scope.deviceReady, false);
                     $scope.socket.on("receive message", $scope.receive);
                     $scope.socket.on("receive issue", $scope.update);
