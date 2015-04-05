@@ -63,12 +63,11 @@ app.post('/sendemail', function(req, response){
     var sEmail = req.body.email;
     var sCode = md5(sEmail + ':' + oCreds.realm).substr(0,4);
     var sMessage = '<p>Thank-you for your interest in tellme!</p><p>Please enter this code: ' + sCode + ' to verify your email</p>';
-    var sUrl = "https://api.sendgrid.com/api/mail.send.json";
     var sSender = "noreply@salesucation.com";
     var oData = {
         from: sSender,
         to: sEmail,
-        subject: 'see included code ... thank-you for your interest',
+        subject: sCode + ' is your code ... please enter it in the app',
         html: sMessage,
         replyto: sSender,
         api_user: oCreds.account,
@@ -100,7 +99,9 @@ app.post('/sendemail', function(req, response){
             sData += chunk;
         });
         res.on('end', function () {
-            response.end('{"result":"' + sData + '"}');
+            var oData = JSON.parse(sData);
+            if(oData.message == "success") response.end('{"result":{"message":"message sent to ' + sEmail + '"}}');
+            else response.end('{"result":' + sData + '}');
         });
     });
 
