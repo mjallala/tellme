@@ -6,7 +6,7 @@
     <description>
         Collaborative editing of issues
     </description>
-    <content src="www/index.html" />
+    <content src="/www/index.html" />
     <author href="https://rhildred.github.io" email="rhildred@gmail.com">
         Rich Hildred and Mobile App Class of 2015
     </author>
