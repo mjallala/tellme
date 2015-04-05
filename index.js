@@ -11,7 +11,7 @@ var express = require("express"),
     https = require('https'),
     bodyParser = require('body-parser'),
     querystring = require('querystring');
-app.use(cors());
+app.use(cors({origin:true}));
 app.use( bodyParser.json() );
 
 var ipaddr = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
