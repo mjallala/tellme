@@ -3,7 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.css" />
     <script src="cordova.js"></script>
     <script src="js/socket.io.js"></script>
     <script src="js/angular.js"></script>
@@ -21,8 +21,14 @@
                         $scope.from = localStorage.from;
                         $scope.email = localStorage.email;
                     }
-                    $scope.socket = io($scope.url);
+                    $scope.socket = io($scope.url, {'reconnection': false});
                     document.addEventListener('deviceready', $scope.deviceReady, false);
+                    $scope.socket.on("receive message", $scope.receive);
+                    $scope.socket.on("receive issue", $scope.update);
+                    $scope.socket.on("disconnect", $scope.retry);
+                },
+                retry: function(){
+                    $scope.socket = io($scope.url);
                     $scope.socket.on("receive message", $scope.receive);
                     $scope.socket.on("receive issue", $scope.update);
                 },
