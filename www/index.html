@@ -19,83 +19,119 @@
     <!-- Required to use $swipe, $drag and Translate services -->
     <script src="js/mobile-angular-ui.gestures.min.js"></script>
     <script src="js/tellme.js"></script>
+    <style>
+        .scrollable {
+            margin-top: 4em;
+        }
+        .app {
+            background: white;
+        }
+    </style>
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl">
-
-    <form ng-submit="setAlias()" ng-hide="email != null">
-        <h1>Connect account to your email</h1>
-        <input ng-model="from" placeholder="desired alias" />
-        <input ng-model="pendingemail" placeholder="enter email address" />
-        <button ng-click="sendEmail()" ng-disabled='!bSendReady()' type="button">Send</button>
-        <input ng-model="code" placeholder="4 character code from email" />
-        <input ng-disabled='!bVerifyReady()' type="submit" />
-        <span ng-bind="servermessage"></span>
-    </form>
-    <div ng-hide="email == null">
-        <div class="sidebar sidebar-right">
-
-            <div class="scrollable">
-                <div class="scrollable-content">
-                    <div class="list-group" ui-toggle="uiSidebarRight">
-
-                        <form ng-submit="sendMessage()">
-                            <h1>Just chatting:</h1>
-                            <input ng-model="message" placeholder="enter your message" />
-                            <input type="submit" />
-                        </form>
-                        <table>
-                            <tr ng-repeat="message in messages">
-                                <td ng-bind="message.from"></td>
-                                <td ng-bind="message.message"></td>
-                            </tr>
-                        </table>
-
-
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
+    <div ng-include="'sidebarRight.html'" class="sidebar sidebar-right"></div>
+    <div class="app">
         <!-- Navbars -->
 
         <div class="navbar navbar-app navbar-absolute-top">
             <div class="navbar-brand navbar-brand-center" ui-yield-to="title">
-                Mobile Angular UI
+                Tellme
             </div>
-            <div class="btn-group pull-right" ui-yield-to="navbarAction">
+            <div ng-hide="email == null" class="btn-group pull-right" ui-yield-to="navbarAction">
                 <div ui-toggle="uiSidebarRight" class="btn">
                     <i class="fa fa-comment"></i> Chat
                 </div>
             </div>
         </div>
-        <h1>Issues to Discuss:</h1>
-        <form ng-submit="addIssue()">
-            <input ng-model="issueTitle" placeholder="new issue" />
-            <input type="submit" />
-        </form>
-        <table>
-            <tbody ng-repeat="issue in model.issues">
-                <tr>
-                    <td ng-bind="issue.reporter"></td>
-                    <td ng-bind="issue.title"></td>
-                </tr>
-                <tr>
-                    <td colspan=2>
-                        <h2>Comments on this issue:</h2>
-                        <form ng-submit="addComment(issue)">
-                            <input ng-model="issue.newcomment" placeholder="comment" />
-                            <input type="submit" />
-                        </form>
-                    </td>
-                </tr>
-                <tr ng-repeat="comment in issue.comments">
-                    <td ng-bind='comment.commenter'></td>
-                    <td ng-bind='comment.comment'></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="scrollable" ng-hide="email != null">
+            <div class="scrollable-content section">
+
+                <form role="form" ng-submit='setAlias()'>
+                    <fieldset>
+                        <legend>Welcome to Tellme</legend>
+                        <p>Please join the conversation about issues with our product by generating an alias for yourself and associating an email with it.</p>
+                        <p>We display messages, issues and comments with your alias rather than your email!</p>
+
+                        <div class="form-group has-success has-feedback">
+                            <label>From Alias</label>
+                            <input ng-model="from" class="form-control" placeholder="Enter alias to identify issues">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" ng-model="pendingemail" class="form-control" placeholder="Enter email">
+                        </div>
+                        <button class="btn btn-primary btn-block" ng-click="sendEmail()" ng-disabled='!bSendReady()' type="button">Send verification code</button>
+
+                        <div class="form-group">
+                            <label>Verification Code</label>
+                            <input ng-model="code" class="form-control" placeholder="4 character code from email" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Remember Me</label>
+                            <ui-switch ng-model='rememberMe'></ui-switch>
+                        </div>
+                    </fieldset>
+                    <hr>
+
+                    <button ng-disabled='!bVerifyReady()' class="btn btn-primary btn-block">
+                        Login
+                    </button>
+
+                </form>
+                <span ng-bind="servermessage"></span>
+            </div>
+        </div>
+        <div class="app-content" ng-hide="email == null">
+            <div class="scrollable">
+                <div class="scrollable-content">
+                    <form role="form" ng-submit="addIssue()">
+                        <fieldset>
+                            <legend>Issues to Discuss</legend>
+                            <div class="form-group has-success has-feedback">
+                                <label>Issue Title</label>
+                                <input ng-model="issueTitle" class="form-control" placeholder="new issue" />
+                            </div>
+                            <button ng-disabled='issueTitle == ""' class="btn btn-primary btn-block">
+                                Submit
+                            </button>
+                        </fieldset>
+                    </form>
+                    <div class="section">
+                        <div class="panel-group" ui-state='myAccordion' ui-default='1'>
+
+                            <div class="panel panel-default" ng-repeat="issue in model.issues">
+                                <div class="panel-heading" ui-set="{'myAccordion': issue.id}">
+
+                                    <h4 class="panel-title">{{issue.title}}<span class="pull-right">Reporter: {{issue.reporter}}</span></h4>
+                                </div>
+                                <div ui-if="myAccordion == issue.id" ui-scope-context='issue'>
+                                    <div class="panel-body">
+                                        <form ng-submit="addComment(issue)">
+                                            <fieldset>
+                                                <legend>Comments</legend>
+                                                <div class="form-group">
+                                                    <textarea ng-model="issue.newcomment" class="form-control" placeholder="new comment"></textarea>
+                                                </div>
+                                                <button ng-disabled='issue.newcomment == ""' class="btn btn-primary btn-block">
+                                                    Submit
+                                                </button>
+                                            </fieldset>
+                                        </form>
+                                        <div ng-repeat="comment in issue.comments">
+                                            <p>&nbsp;<span class="pull-right">Commenter: {{comment.commenter}}</span>
+                                            </p>
+                                            <p ng-bind='comment.comment'></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 

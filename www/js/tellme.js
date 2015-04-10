@@ -1,4 +1,14 @@
-angular.module("myApp", []).controller("myCtrl", function ($scope, $http) {
+angular.module("myApp", [
+    'mobile-angular-ui',
+
+    // touch/drag feature: this is from 'mobile-angular-ui.gestures.js'
+    // it is at a very beginning stage, so please be careful if you like to use
+    // in production. This is intended to provide a flexible, integrated and and
+    // easy to use alternative to other 3rd party libs like hammer.js, with the
+    // final pourpose to integrate gestures into default ui interactions like
+    // opening sidebars, turning switches on/off ..
+    'mobile-angular-ui.gestures'
+]).controller("myCtrl", function ($scope, $http) {
    angular.extend($scope, {
        pendingemail: "",
        from: "",
@@ -92,8 +102,11 @@ angular.module("myApp", []).controller("myCtrl", function ($scope, $http) {
            }
            $http.post($scope.url + "verifyemail", data).success(function (data) {
                if (data.result == "success") {
-                   localStorage.email = $scope.email = $scope.pendingemail;
-                   localStorage.from = $scope.from;
+                   $scope.email = $scope.pendingemail;
+                   if($scope.rememberMe){
+                       localStorage.email = $scope.email;
+                       localStorage.from = $scope.from;
+                   }
                } else {
                    $scope.servermessage = data.result;
                }
@@ -116,4 +129,35 @@ angular.module("myApp", []).controller("myCtrl", function ($scope, $http) {
        }
    });
    $scope.init();
+      //
+  // Right Sidebar
+  //
+  $scope.chatUsers = [
+    { name: 'Carlos  Flowers', online: true },
+    { name: 'Byron Taylor', online: true },
+    { name: 'Jana  Terry', online: true },
+    { name: 'Darryl  Stone', online: true },
+    { name: 'Fannie  Carlson', online: true },
+    { name: 'Holly Nguyen', online: true },
+    { name: 'Bill  Chavez', online: true },
+    { name: 'Veronica  Maxwell', online: true },
+    { name: 'Jessica Webster', online: true },
+    { name: 'Jackie  Barton', online: true },
+    { name: 'Crystal Drake', online: false },
+    { name: 'Milton  Dean', online: false },
+    { name: 'Joann Johnston', online: false },
+    { name: 'Cora  Vaughn', online: false },
+    { name: 'Nina  Briggs', online: false },
+    { name: 'Casey Turner', online: false },
+    { name: 'Jimmie  Wilson', online: false },
+    { name: 'Nathaniel Steele', online: false },
+    { name: 'Aubrey  Cole', online: false },
+    { name: 'Donnie  Summers', online: false },
+    { name: 'Kate  Myers', online: false },
+    { name: 'Priscilla Hawkins', online: false },
+    { name: 'Joe Barker', online: false },
+    { name: 'Lee Norman', online: false },
+    { name: 'Ebony Rice', online: false }
+  ];
+
 });
