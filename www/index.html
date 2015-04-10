@@ -23,14 +23,41 @@
         .scrollable {
             margin-top: 4em;
         }
+
         .app {
             background: white;
+        }
+
+        .sidebar {
+            background: #eee;
         }
     </style>
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl">
-    <div ng-include="'sidebarRight.html'" class="sidebar sidebar-right"></div>
+    <div class="sidebar sidebar-right">
+        <div class="scrollable">
+            <div class="scrollable-content">
+                <form role="form" ng-submit="sendMessage()">
+                    <fieldset>
+                        <legend>Just Chatting</legend>
+                        <div class="form-group">
+                            <input ng-model="message" class="form-control" placeholder="enter your message" />
+                        </div>
+                        <button ng-disabled='!message' class="btn btn-primary btn-block">
+                            Submit
+                        </button>
+                    </fieldset>
+                </form>
+                <div ng-repeat="message in messages">
+                    <p>&nbsp;<span class="pull-right" ng-bind="message.from"></span>
+                    </p>
+                    <p ng-bind="message.message"></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <div class="app">
         <!-- Navbars -->
 
