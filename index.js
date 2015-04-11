@@ -45,7 +45,8 @@ var $scope = {
     newIssue: function(data) {
         var oCleaned = {
             reporter: _.escape(data.reporter),
-            title: _.escape(data.title)
+            title: _.escape(data.title),
+            id: _.escape(data.id)
         }
         $scope.model.issues.unshift(oCleaned);
         io.emit("receive issue", $scope.model);
