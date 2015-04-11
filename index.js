@@ -43,15 +43,22 @@ var $scope = {
         io.emit("receive message", $scope.model);
     },
     newIssue: function(data) {
-        $scope.model.issues.unshift(data);
+        var oCleaned = {
+            reporter: _.escape(data.reporter),
+            title: _.escape(data.title)
+        }
+        $scope.model.issues.unshift(oCleaned);
         io.emit("receive issue", $scope.model);
     },
     newComment: function(data){
+        var oCleaned = {
+            commenter: _.escape(data.commenter),
+            comment: _.escape(data.comment)
+        }
         for(var n = 0; n < $scope.model.issues.length; n++){
             if($scope.model.issues[n].id == data.id){
-                delete data.id;
                 // then we want to add the comment to this issue
-                $scope.model.issues[n].comments.unshift(data);
+                $scope.model.issues[n].comments.unshift(oCleaned);
                 io.emit("receive issue", $scope.model);
                 return;
             }
