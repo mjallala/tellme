@@ -85,7 +85,7 @@ angular.module("myApp", [
                comment: issue.newcomment
            };
            $scope.socket.emit('receive comment', data);
-           issue.newComment = "";
+           issue.newcomment = "";
        },
        sendEmail: function () {
            var data = {
