@@ -16,7 +16,7 @@ angular.module("myApp", [
        code: "",
        socket: null,
        // commented out to put on gh-pages branch ... for local testing uncomment this
-       // url: document.URL,
+       //url: document.URL,
        url: "https://tellme-hildred.rhcloud.com/",
        init: function () {
            if (typeof (localStorage.getItem("email")) != 'undefined') {
